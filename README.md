@@ -29,6 +29,8 @@ Traversals support two primitive operations:
 
 The second primitive operation of a traversal is a tranformation, not a setter. With a lens, you can implement a `lens-transform` operation using `lens-view` and `lens-set`. However, since there is no `traversal-get`, you cannot use the same trick. When there are multiple targets, an updater is strictly more general than a setter. An updater can be applied to each target and do different things depending on each target's value. In contrast, a would have to do the same thing to each target. Also, if there are no targets, trying to get and set makes even less sense.
 
+It might make sense to provide a setter which expects a sequence of the same length as the result of viewing, but I don't like the idea of that. It seems flimsy
+
 # Prisms
 
 A [Prism S T] is similar to a lens, but has exactly 0 or 1 target. For example, if I have a little arithmetic expression language with addition, multiplication, numbers, and variables, I might make a prism for the left sub-expression of an arithmetic expression. In the number and variable cases, there'd be zero targets. In the addition and multiplication cases, there'd be one target.
@@ -41,3 +43,16 @@ Prisms support two primitive operations:
 The primitive operation is a transform for a similar reason to traversals.
 
 
+# Hierarchy
+
+An Iso is a Lens
+A Lens is a Prism
+A Prism is a Traversal
+
+# Composition
+
+Optics can compose. Composing two lenses allows field-of-field access. The semantics for other optics are similar. For example, if I have a list of rectangles (top-left, bottom right) and I want to talk about each width, I'd compose a list traversal, a rectangle-tlbr<->rectangle-tlwh iso, and a rectangle-width lens. This would yield a traversal which, when transformed over, would transform the width of each rectangle in the list.
+
+# Organization
+
+There is a generic interface for each optic type. There are struct implementations of these interfaces, where each optic struct implements its corresponding generic interface and super-interface(s).
